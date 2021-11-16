@@ -34,17 +34,28 @@ function getFoodList(keyword) {
         .then(function (response) {
             console.log(JSON.stringify(response.data));
             return {
-                statusCode: 200,
-                body: JSON.stringify(response.data)                
+                success: true,
+                // body: JSON.stringify(response.data)
+                data: {
+                    foodList: response.data.foods.map(food => {
+                        return {
+                            "id":food.tags.tag_id,
+                            "name": food.tags.item,
+                            "qty" : food.tags.quantity,
+                            "cal" : food.nf_calories,                          
+                            "photo":food.photo.thumb,    
+                        }
+                    })
+                }
             }
         })
         .catch(function (error) {
             console.log(error);
             return { 
-                statusCode: 500, 
-                body: err.toString() }
+                successs: false, 
+                body: error.toString() }
         });
 }
+export default getFoodList;
 
-
-getFoodList("3 eggs");
+// getFoodList("3 eggs");
