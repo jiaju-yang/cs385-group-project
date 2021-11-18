@@ -33,7 +33,8 @@ Find an unassigned issue [here](https://github.com/jiaju-yang/cs385-group-projec
 
 ## Step 2: Coding
 
-First, fetch updated code: `git fetch origin`
+First, fetch updated code:
+`git fetch origin`
 
 Second, create a feature branch based on the current `main` branch:
 
