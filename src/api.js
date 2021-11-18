@@ -57,5 +57,3 @@ function getFoodList(keyword) {
         });
 }
 export default getFoodList;
-
-// getFoodList("3 eggs");
