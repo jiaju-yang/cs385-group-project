@@ -47,7 +47,7 @@ git checkout -b issueXX
 Now you can start to code. After you finished your coding, commit your code in your local machine:
 ```bash
 git add FILE_NAME
-git commit
+git commit -m "add your commit details"
 ```
 
 Then you can update your code to the newest again because during your coding, somebody else might submit some other features:
