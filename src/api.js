@@ -39,7 +39,7 @@ function getFoodList(keyword) {
         data: data
     };
 
-    axios(config)
+    return axios(config)
         .then(function (response) {
             console.log(JSON.stringify(response.data));
             return {
@@ -49,11 +49,11 @@ function getFoodList(keyword) {
                     //handle the response data, return the data what we need.
                     foodList: response.data.foods.map(food => {
                         return {
-                            "id":food.tags.tag_id,
+                            "id": food.tags.tag_id,
                             "name": food.tags.item,
-                            "qty" : food.tags.quantity,
-                            "cal" : food.nf_calories,                          
-                            "photo":food.photo.thumb,    
+                            "qty": food.tags.quantity,
+                            "cal": food.nf_calories,
+                            "photo": food.photo.thumb,
                         }
                     })
                 }
@@ -62,9 +62,10 @@ function getFoodList(keyword) {
         .catch(function (error) {
             //catch the api request error information 
             console.log(error);
-            return { 
-                successs: false, 
-                body: error.toString() }
+            return {
+                success: false,
+                data: { error: error.toString() }
+            }
         });
 }
 export default getFoodList;
