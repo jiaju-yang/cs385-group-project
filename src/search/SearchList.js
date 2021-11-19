@@ -3,8 +3,6 @@ import Food from "./Food";
 
 class SearchList extends Component {
     render() {
-        console.log(this.props.foodList)
-        //todo
         return (
         <div className="foodList">
             <h1>Food</h1>
