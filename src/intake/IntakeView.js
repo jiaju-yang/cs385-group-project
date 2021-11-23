@@ -1,8 +1,10 @@
 import { Component } from "react";
 
-class SearchView extends Component {
+class IntakeView extends Component {
     render() {
         //todo
         return (<div>Hello, I'm IntakeView</div>)
     }
 }
+
+export default IntakeView
