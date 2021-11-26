@@ -1,6 +1,5 @@
 import { Component } from "react";
 import Food from "./Food";
-// import getFoodList from "../api";
 
 
 class SearchList extends Component {

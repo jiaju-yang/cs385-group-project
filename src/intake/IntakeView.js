@@ -1,6 +1,5 @@
 import { Component } from "react";
 import PubSub from 'pubsub-js';
-// import Food from "../search/Food";
 import { Button } from 'antd';
 import { MinusCircleOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
@@ -11,7 +10,7 @@ class IntakeView extends Component {
         this.state = { intakeFood: [] };
     }
     deleteIntake(foodID) {
-        let indexToRemove = this.state.intakeFood.findIndex(
+        const indexToRemove = this.state.intakeFood.findIndex(
             this.searchForFoodByID(foodID));
         if (indexToRemove >= 0) this.removeProduct(indexToRemove);
     }
@@ -23,7 +22,7 @@ class IntakeView extends Component {
     }
     removeProduct(indexToRemove) {
         if (this.state.intakeFood.length > 0) {
-            let tempList = this.state.intakeFood;
+            const tempList = this.state.intakeFood;
             tempList.splice(indexToRemove, 1);
             this.setState({ intakeFood: tempList });
         }
@@ -65,8 +64,4 @@ class IntakeView extends Component {
     }
 }
 
-<<<<<<< HEAD
-export default IntakeView
-=======
 export default IntakeView;
->>>>>>> 0fb0cf1 (The IntakeView component is to display the food list that the userate.)
