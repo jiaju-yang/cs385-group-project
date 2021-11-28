@@ -1,4 +1,6 @@
 import { Component } from "react";
+import { UserTypedSearchKeyword, UserSearchFood } from "../event";
+import PubSub from 'pubsub-js';
 
 class SearchInput extends Component {
     render() {
@@ -9,10 +11,16 @@ class SearchInput extends Component {
                     <input
                         type="text"
                         value={this.props.searchKeyword}
-                        onChange={event => this.props.userTypedSearchKeyword(event.target.value)}
+                        onChange={event => {
+                            PubSub.publish(UserTypedSearchKeyword, { keyword: event.target.value });
+                        }}
                     />
                 </form>
-                <button onClick={event => this.props.fetchFoods(this.props.searchKeyword)}>Search</button>
+                <button onClick={event => {
+                    PubSub.publish(UserSearchFood, { keyword: this.props.searchKeyword });
+                }}>
+                    Search
+                </button>
                 <hr />
             </div>
         );
