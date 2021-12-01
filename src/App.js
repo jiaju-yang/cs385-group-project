@@ -17,6 +17,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import SignIn from "./SignIn";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseApp } from "./fbconfig";
+import { addFood, getFood } from "./repository"
 
 
 class App extends Component {
@@ -72,8 +73,9 @@ class App extends Component {
         });
     })
 
-    PubSub.subscribe(UserAddedFoodToIntakeList, (msg, data) => {
-      parent.setState({ intakeFood: [data, ...parent.state.intakeFood] });
+    PubSub.subscribe(UserAddedFoodToIntakeList, async (msg, { name, calories, photo, quantity }) => {
+      const newFood = await addFood(this.state.user.uid, { name, calories, photo, quantity });
+      parent.setState({ intakeFood: [newFood, ...parent.state.intakeFood] });
     })
 
     PubSub.subscribe(UserDeletedFoodFromIntakeList, (msg, data) => {
@@ -85,22 +87,25 @@ class App extends Component {
     PubSub.subscribe(UserAttemptsToLogin, (msg, { email, password }) => {
       const auth = getAuth(firebaseApp);
       signInWithEmailAndPassword(auth, email, password)
-        .then((userCredentials) => {
+        .then(async (userCredentials) => {
           const user = userCredentials.user;
+          const foods = await getFood(user.uid);
           this.setState({
+            intakeFood: foods,
             user: {
               isLogin: true,
               email: user.email,
               accessToken: user.accessToken,
               uid: user.uid
             }
-          })
+          });
         })
         .catch((error) => {
           PubSub.publish(UserLoginFail, { reason: error })
         });
     })
   }
+
 
   removeProduct(indexToRemove) {
     if (this.state.intakeFood.length > 0) {
