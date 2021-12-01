@@ -1,7 +1,7 @@
 
 import { Component } from "react";
 import React from 'react';
-import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList } from "./event";
+import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList, UserAttemptsToLogin, UserLoginFail } from "./event";
 import getFoodList from "./api";
 import { apiStatus } from "./enums";
 import PubSub from 'pubsub-js';
@@ -14,6 +14,9 @@ import Paper from '@mui/material/Paper';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import CssBaseline from '@mui/material/CssBaseline';
+import SignIn from "./SignIn";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { firebaseApp } from "./fbconfig";
 
 
 class App extends Component {
@@ -25,7 +28,13 @@ class App extends Component {
       "fetchingStatus": apiStatus.no_fetch,
       "fetchingError": "",
       "intakeFood": [],
-      "layout": "search"
+      "layout": "home",
+      "user": {
+        isLogin: false,
+        email: "",
+        accessToken: null,
+        uid: null
+      }
     }
   }
   componentDidMount() {
@@ -72,6 +81,25 @@ class App extends Component {
         this.searchForFoodById(data.foodId));
       if (indexToRemove >= 0) this.removeProduct(indexToRemove);
     })
+
+    PubSub.subscribe(UserAttemptsToLogin, (msg, { email, password }) => {
+      const auth = getAuth(firebaseApp);
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredentials) => {
+          const user = userCredentials.user;
+          this.setState({
+            user: {
+              isLogin: true,
+              email: user.email,
+              accessToken: user.accessToken,
+              uid: user.uid
+            }
+          })
+        })
+        .catch((error) => {
+          PubSub.publish(UserLoginFail, { reason: error })
+        });
+    })
   }
 
   removeProduct(indexToRemove) {
@@ -101,6 +129,8 @@ class App extends Component {
         <IntakeView
           intakeFood={this.state.intakeFood}
         />,
+      "home":
+        <SignIn />
     };
     return (
       <div className="App">
@@ -115,6 +145,7 @@ class App extends Component {
                 this.setState({ layout: newLayout });
               }}
             >
+              <BottomNavigationAction label="Home" value="home" icon={<AnalyticsIcon />} />
               <BottomNavigationAction label="Search" value="search" icon={<SearchIcon />} />
               <BottomNavigationAction label="Intake" value="intake" icon={<AnalyticsIcon />} />
             </BottomNavigation>
