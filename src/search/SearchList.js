@@ -10,7 +10,9 @@ class SearchList extends Component {
         <hr />
         {this.props.foodList.map((f) => (
           <div key={f.id}>
-            <Food id={f.id} name={f.name} calories={f.cal} photo={f.photo} quantity={f.qty} />
+            <Food id={f.id} name={f.name} calories={f.cal} photo={f.photo} 
+            // quantity={f.qty} 
+            />
           </div>
         ))}
       </div>
