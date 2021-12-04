@@ -1,7 +1,7 @@
 
 import { Component } from "react";
 import React from 'react';
-import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList, UserAttemptsToLogin, UserLoginFail } from "./event";
+import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList, UserAttemptsToLogin, UserLoginFail,UserUpdatedFoodFromIntakeList } from "./event";
 import getFoodList from "./api";
 import { apiStatus } from "./enums";
 import PubSub from 'pubsub-js';
@@ -17,7 +17,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import SignIn from "./SignIn";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseApp } from "./fbconfig";
-import { addFood, getFood } from "./repository"
+import { addFood, getFood, updateFood, deleteFood } from "./repository"
+import 'antd/dist/antd.css';
 
 
 class App extends Component {
@@ -35,7 +36,8 @@ class App extends Component {
         email: "",
         accessToken: null,
         uid: null
-      }
+      },
+      "singleKindOfFood":[]
     }
   }
   componentDidMount() {
@@ -65,7 +67,9 @@ class App extends Component {
           } else {
             parent.setState({
               "searchKeyword": data.keyword,
-              "foundFoods": [],
+              //use some fake date
+              "foundFoods": [{"id":1,"name":'egg',"cal":100, "photo":null},
+              {"id":2,"name":'apple',"cal":50, "photo":null}],
               "fetchingStatus": apiStatus.failed,
               "fetchingError": result.data.error
             })
@@ -73,16 +77,29 @@ class App extends Component {
         });
     })
 
-    PubSub.subscribe(UserAddedFoodToIntakeList, async (msg, { name, calories, photo, quantity }) => {
-      const newFood = await addFood(this.state.user.uid, { name, calories, photo, quantity });
-      parent.setState({ intakeFood: [newFood, ...parent.state.intakeFood] });
-    })
+    PubSub.subscribe(UserAddedFoodToIntakeList, async (msg, {  foodId, name, calories, photo, quantity, intakeDate}) => {
+        const newFood = await addFood(this.state.user.uid,  {  foodId, name, calories, photo, quantity, intakeDate});
+        parent.setState({ 
+          intakeFood: [newFood, ...parent.state.intakeFood],
+        })
+    });
+    PubSub.subscribe(UserUpdatedFoodFromIntakeList, async (msg, {  foodId, quantity, intakeDate}) => {
+      const foodToUpdate =  parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
+      await updateFood(this.state.user.uid, foodToUpdate.id, foodToUpdate.quantity+quantity);
+      
+      var qty = foodToUpdate.quantity + quantity;
+      foodToUpdate.quantity =qty;
+      this.setState({intakeFood:[...this.state.intakeFood]})
+    });
+    
 
-    PubSub.subscribe(UserDeletedFoodFromIntakeList, (msg, data) => {
-      const indexToRemove = this.state.intakeFood.findIndex(
-        this.searchForFoodById(data.foodId));
-      if (indexToRemove >= 0) this.removeProduct(indexToRemove);
-    })
+    //DELETE food from food list
+    PubSub.subscribe(UserDeletedFoodFromIntakeList, async(msg, { foodId, intakeDate}) => {
+      const foodToDelete =  parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
+      const index = this.state.intakeFood.indexOf(foodToDelete);
+      await deleteFood(this.state.user.uid, foodToDelete.id);
+      this.removeProduct(index);
+    });
 
     PubSub.subscribe(UserAttemptsToLogin, (msg, { email, password }) => {
       const auth = getAuth(firebaseApp);
@@ -105,7 +122,7 @@ class App extends Component {
         });
     })
   }
-
+  
 
   removeProduct(indexToRemove) {
     if (this.state.intakeFood.length > 0) {
@@ -115,12 +132,7 @@ class App extends Component {
     }
   }
 
-  searchForFoodById(id) {
-    return function (theObject) {
-      return theObject.id === id;
-    };
-  }
-
+  
   render() {
     const layouts = {
       "search":
@@ -129,10 +141,12 @@ class App extends Component {
           fetchingStatus={this.state.fetchingStatus}
           fetchingError={this.state.fetchingError}
           foundFoods={this.state.foundFoods}
+          intakeList={this.state.intakeFood}
         />,
       "intake":
         <IntakeView
           intakeFood={this.state.intakeFood}
+          
         />,
       "home":
         <SignIn />
