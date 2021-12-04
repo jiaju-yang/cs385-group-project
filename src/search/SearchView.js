@@ -4,6 +4,7 @@ import SearchList from "./SearchList"
 
 
 class SearchView extends Component {
+
     render() {
         return (
             <div className="SearchView">
@@ -14,6 +15,7 @@ class SearchView extends Component {
                     fetchingStatus={this.props.fetchingStatus}
                     fetchingError={this.props.fetchingError}
                     foodList={this.props.foundFoods}
+                    intakeList={this.props.intakeList}
                 />
             </div>
         )

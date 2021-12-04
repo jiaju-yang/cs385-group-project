@@ -3,7 +3,7 @@ import PubSub from 'pubsub-js';
 import { Button,Tooltip } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
-import { UserDeletedFoodFromIntakeList } from "../event";
+import { UserUpdatedFoodFromIntakeList, UserDeletedFoodFromIntakeList } from "../event";
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
@@ -15,9 +15,35 @@ class IntakeView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: new Date(),
+      intakeDate: new Date(),
     }
   }
+
+  onAddByOne = (f) => {
+    PubSub.publish(UserUpdatedFoodFromIntakeList,
+      {foodId: f.foodId,
+        quantity: 1,
+        intakeDate: this.state.intakeDate,
+        });
+  }
+
+  onRemoveByOne = (f) => {
+    if(f.quantity == 1){
+      PubSub.publish(UserDeletedFoodFromIntakeList,
+        {
+          foodId: f.foodId,
+          intakeDate: this.state.intakeDate,
+        });
+    }else{
+      PubSub.publish(UserUpdatedFoodFromIntakeList,
+        {
+          foodId: f.foodId,
+          quantity: -1,
+          intakeDate: this.state.intakeDate,
+        });
+    }
+  }
+
   render() {
 
     return (
@@ -30,7 +56,7 @@ class IntakeView extends Component {
               label="Custom input"
               value={this.state.date}
               onChange={(newValue) => {
-                this.setState({date:newValue});
+                this.setState({intakeDate:newValue});
               }}
               renderInput={({ inputRef, inputProps, InputProps }) => (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -41,7 +67,7 @@ class IntakeView extends Component {
             />
           </LocalizationProvider>
         </div>
-        {this.props.intakeFood.map((f, index) => ((f.intakeDate ===this.state.date.toDateString()) &&
+        {this.props.intakeFood.map((f, index) => ((f.intakeDate.toDateString() === this.state.intakeDate.toDateString()) &&
           <div style={{padding:"20px"}} key={index}>
             <img src={f.photo} alt={f.name} style={{ position: 'relative', width: '40px', margin: '10px 30px', verticalAlign: 'center' }} />
             <div style={{ position: 'relative', marginLeft: '70px', marginTop: '-55px' }}>
@@ -49,22 +75,16 @@ class IntakeView extends Component {
               <span style={{ color: 'orange', fontSize: '0.8rem', fontWeight: 'bold', paddingLeft: '20px' }}>{f.calories}&nbsp;cal&nbsp;</span>
               {/* <span style={{ color: 'grey', fontSize: '0.8rem', fontWeight: 'italic' }}>/&nbsp;{f.quantity}</span> */}
               <div style={{ position: 'relative', float: 'right', right: '20px', bottom: '20px',alignItems:'center' }}>
-                {/* <Button type="primary"
-                  onClick={() => {
-                    PubSub.publish(UserDeletedFoodFromIntakeList, { foodId: f.id });
-                  }}>
-                  <PlusOutlined />
-                </Button> */}
                 <Tooltip title="remove" onClick={() => {
                     // PubSub.publish(UserDeletedFoodFromIntakeList, { foodId: f.id });
-                    this.props.onRemoveByOne(f);
+                    this.onRemoveByOne(f);
                   }}>
                   <Button shape="circle" icon={<MinusOutlined />} />
                 </Tooltip>
-                <span style={{ color: 'blue',padding:'5px',margin:'5px' }}> {f.qty}</span>
+                <span style={{ color: 'blue',padding:'5px',margin:'5px' }}> {f.quantity}</span>
                 <Tooltip title="add" onClick={() => {
                   // PubSub.publish(UserDeletedFoodFromIntakeList, { foodId: f.id });
-                  this.props.onAddByOne(f);
+                  this.onAddByOne(f);
                 }}>
                   <Button shape="circle" icon={<PlusOutlined />} />
                 </Tooltip>
