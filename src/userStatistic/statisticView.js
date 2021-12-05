@@ -2,7 +2,7 @@ import { Component } from "react";
 import Barchart from "./Barchart";
 
 
-class statisticView extends Component {
+class StatisticView extends Component {
     render() {
         return (
             <div className="statisticView">
@@ -13,4 +13,4 @@ class statisticView extends Component {
     }
 }
 
-export default statisticView;
+export default StatisticView;
