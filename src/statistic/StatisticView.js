@@ -6,8 +6,9 @@ class StatisticView extends Component {
     render() {
         return (
             <div className="statisticView">
-                <Barchart                   
-                />                
+                <Barchart
+                    intakeFood={this.props.intakeFood}
+                />
             </div>
         )
     }

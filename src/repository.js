@@ -9,9 +9,7 @@ async function addFood(uid, { foodId, name, calories, photo, quantity, intakeDat
 }
 
 async function updateFood(uid, id, quantity) {
-   
-    const foodToUpdate = doc(collection(db, uid + "foods"),id);
-    await updateDoc(foodToUpdate, {
+    await updateDoc(doc(db, uid + "foods", id), {
         "quantity": quantity
     });
 }
@@ -20,7 +18,10 @@ async function getFood(uid) {
     const q = query(collection(db, uid + "foods"));
     const foods = await getDocs(q);
     return foods.docs.map(food => {
-        return food.data();
+        const data = food.data();
+        data.intakeDate = data.intakeDate.toDate();
+        data.id = food.id;
+        return data;
     })
 }
 

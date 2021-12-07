@@ -1,34 +1,51 @@
 import React, { Component } from "react";
-import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import RaisedButton from "material-ui/RaisedButton";
-import Login from "./Login";
-import Register from "./Register";
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { AppBar, Button, TextField } from '@mui/material'
+import { UserAttemptsToLogin } from "../event";
+import PubSub from 'pubsub-js';
+
 class LoginView extends Component {
-  
-  handleClick(event) {
-    // console.log("event",event);
-    var isLogin=this.props.isLogin;
-    if (!isLogin) {    
-      <Login parentContext={this} />    
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: ""
+    };
   }
-  
+
+  handleClick(event) {
+    PubSub.publish(UserAttemptsToLogin, { email: this.state.username, password: this.state.password })
+  }
+
   render() {
     return (
-      <div className="LoginView">
-        {this.state.LoginView}
-        <div>
-          {this.state.loginmessage}
-          <MuiThemeProvider>
-            <div>        
-            </div>
-          </MuiThemeProvider>
-        </div>
+      <div>
+        <MuiThemeProvider>
+          <div>
+            <AppBar title="Login" />
+            <TextField
+              label="Username"
+              type="username"
+              onChange={(event) =>
+                this.setState({ username: event.target.value })
+              }
+            />
+            <br />
+            <TextField
+              label="Password"
+              type="password"
+              onChange={(event) =>
+                this.setState({ password: event.target.value })
+              }
+            />
+            <br />
+            <Button
+              onClick={(event) => this.handleClick(event)}
+            >Submit</Button>
+          </div>
+        </MuiThemeProvider>
       </div>
     );
   }
 }
-const style = {
-  margin: 15
-};
 export default LoginView;
