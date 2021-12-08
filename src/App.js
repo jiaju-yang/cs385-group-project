@@ -1,7 +1,7 @@
 
 import { Component } from "react";
 import React from 'react';
-import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList, UserAttemptsToLogin, UserLoginFail,UserUpdatedFoodFromIntakeList } from "./event";
+import { UserTypedSearchKeyword, UserSearchFood, UserAddedFoodToIntakeList, UserDeletedFoodFromIntakeList, UserAttemptsToLogin, UserLoginFail, UserUpdatedFoodFromIntakeList } from "./event";
 import getFoodList from "./api";
 import { apiStatus } from "./enums";
 import PubSub from 'pubsub-js';
@@ -14,7 +14,8 @@ import Paper from '@mui/material/Paper';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import CssBaseline from '@mui/material/CssBaseline';
-import SignIn from "./SignIn";
+import LoginView from "./login/LoginView";
+import StatisticView from "./statistic/StatisticView";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseApp } from "./fbconfig";
 import { addFood, getFood, updateFood, deleteFood } from "./repository"
@@ -37,7 +38,7 @@ class App extends Component {
         accessToken: null,
         uid: null
       },
-      "singleKindOfFood":[]
+      "singleKindOfFood": []
     }
   }
   componentDidMount() {
@@ -68,8 +69,8 @@ class App extends Component {
             parent.setState({
               "searchKeyword": data.keyword,
               //use some fake date
-              "foundFoods": [{"id":1,"name":'egg',"cal":100, "photo":null},
-              {"id":2,"name":'apple',"cal":50, "photo":null}],
+              "foundFoods": [{ "id": 1, "name": 'egg', "cal": 100, "photo": null },
+              { "id": 2, "name": 'apple', "cal": 50, "photo": null }],
               "fetchingStatus": apiStatus.failed,
               "fetchingError": result.data.error
             })
@@ -77,25 +78,25 @@ class App extends Component {
         });
     })
 
-    PubSub.subscribe(UserAddedFoodToIntakeList, async (msg, {  foodId, name, calories, photo, quantity, intakeDate}) => {
-        const newFood = await addFood(this.state.user.uid,  {  foodId, name, calories, photo, quantity, intakeDate});
-        parent.setState({ 
-          intakeFood: [newFood, ...parent.state.intakeFood],
-        })
+    PubSub.subscribe(UserAddedFoodToIntakeList, async (msg, { foodId, name, calories, photo, quantity, intakeDate }) => {
+      const newFood = await addFood(this.state.user.uid, { foodId, name, calories, photo, quantity, intakeDate });
+      parent.setState({
+        intakeFood: [newFood, ...parent.state.intakeFood],
+      })
     });
-    PubSub.subscribe(UserUpdatedFoodFromIntakeList, async (msg, {  foodId, quantity, intakeDate}) => {
-      const foodToUpdate =  parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
-      await updateFood(this.state.user.uid, foodToUpdate.id, foodToUpdate.quantity+quantity);
-      
+    PubSub.subscribe(UserUpdatedFoodFromIntakeList, async (msg, { foodId, quantity, intakeDate }) => {
+      const foodToUpdate = parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
+      await updateFood(this.state.user.uid, foodToUpdate.id, foodToUpdate.quantity + quantity);
+
       var qty = foodToUpdate.quantity + quantity;
-      foodToUpdate.quantity =qty;
-      this.setState({intakeFood:[...this.state.intakeFood]})
+      foodToUpdate.quantity = qty;
+      this.setState({ intakeFood: [...this.state.intakeFood] })
     });
-    
+
 
     //DELETE food from food list
-    PubSub.subscribe(UserDeletedFoodFromIntakeList, async(msg, { foodId, intakeDate}) => {
-      const foodToDelete =  parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
+    PubSub.subscribe(UserDeletedFoodFromIntakeList, async (msg, { foodId, intakeDate }) => {
+      const foodToDelete = parent.state.intakeFood.find((f) => f.foodId === foodId && f.intakeDate.toDateString() === intakeDate.toDateString());
       const index = this.state.intakeFood.indexOf(foodToDelete);
       await deleteFood(this.state.user.uid, foodToDelete.id);
       this.removeProduct(index);
@@ -122,7 +123,7 @@ class App extends Component {
         });
     })
   }
-  
+
 
   removeProduct(indexToRemove) {
     if (this.state.intakeFood.length > 0) {
@@ -132,46 +133,56 @@ class App extends Component {
     }
   }
 
-  
+
   render() {
-    const layouts = {
-      "search":
-        <SearchView
-          searchKeyword={this.state.searchKeyword}
-          fetchingStatus={this.state.fetchingStatus}
-          fetchingError={this.state.fetchingError}
-          foundFoods={this.state.foundFoods}
-          intakeList={this.state.intakeFood}
-        />,
-      "intake":
-        <IntakeView
-          intakeFood={this.state.intakeFood}
-          
-        />,
-      "home":
-        <SignIn />
-    };
-    return (
-      <div className="App">
+    if (this.state.user.isLogin) {
+      const layouts = {
+        "search":
+          <SearchView
+            searchKeyword={this.state.searchKeyword}
+            fetchingStatus={this.state.fetchingStatus}
+            fetchingError={this.state.fetchingError}
+            foundFoods={this.state.foundFoods}
+            intakeList={this.state.intakeFood}
+          />,
+        "intake":
+          <IntakeView
+            intakeFood={this.state.intakeFood}
+          />,
+        "home":
+          <StatisticView
+            intakeFood={this.state.intakeFood} />
+      };
+      return (
+        <div className="App">
+          <Box sx={{ pb: 7 }}>
+            <CssBaseline />
+            {layouts[this.state.layout]}
+            <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={2}>
+              <BottomNavigation
+                showLabels
+                value={this.state.layout}
+                onChange={(event, newLayout) => {
+                  this.setState({ layout: newLayout });
+                }}
+              >
+                <BottomNavigationAction label="Home" value="home" icon={<AnalyticsIcon />} />
+                <BottomNavigationAction label="Search" value="search" icon={<SearchIcon />} />
+                <BottomNavigationAction label="Intake" value="intake" icon={<AnalyticsIcon />} />
+              </BottomNavigation>
+            </Paper>
+          </Box>
+        </div >
+      );
+    } else {
+      return (<div className="App">
         <Box sx={{ pb: 7 }}>
           <CssBaseline />
-          {layouts[this.state.layout]}
-          <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={2}>
-            <BottomNavigation
-              showLabels
-              value={this.state.layout}
-              onChange={(event, newLayout) => {
-                this.setState({ layout: newLayout });
-              }}
-            >
-              <BottomNavigationAction label="Home" value="home" icon={<AnalyticsIcon />} />
-              <BottomNavigationAction label="Search" value="search" icon={<SearchIcon />} />
-              <BottomNavigationAction label="Intake" value="intake" icon={<AnalyticsIcon />} />
-            </BottomNavigation>
-          </Paper>
+          <LoginView />
         </Box>
-      </div >
-    );
+      </div >);
+    }
+
   }
 }
 

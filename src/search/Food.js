@@ -3,8 +3,8 @@ import React, { Component } from 'react'
 import { PlusCircleOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import PubSub from 'pubsub-js';
-import { UserAddedFoodToIntakeList,UserUpdatedFoodFromIntakeList } from "../event";
-import { Modal, InputNumber,Tooltip, Button } from 'antd';
+import { UserAddedFoodToIntakeList, UserUpdatedFoodFromIntakeList } from "../event";
+import { Modal, InputNumber, Button } from 'antd';
 import Box from '@mui/material/Box';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -14,45 +14,47 @@ export default class Food extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      "isDateModalVisible":false,
+      "isDateModalVisible": false,
       "isQuantityModalVisible": false,
       "intakeDate": new Date(),
       "foodQuantity": 1,
       "foodToAdd": null,
     }
   }
-  
+
   addButtonHandler = () => {
-    this.setState({isDateModalVisible:true,
-      foodToAdd:{foodId:this.props.foodId,name:this.props.name,photo:this.props.photo,calories:this.props.calories}})
+    this.setState({
+      isDateModalVisible: true,
+      foodToAdd: { foodId: this.props.foodId, name: this.props.name, photo: this.props.photo, calories: this.props.calories }
+    })
   };
 
   //close the date selector window
   dateHandleOk = () => {
-    this.setState({isDateModalVisible:false});
+    this.setState({ isDateModalVisible: false });
     //pop a hint window to select food quantity
-    this.setState({isQuantityModalVisible:true});
+    this.setState({ isQuantityModalVisible: true });
     //date has been stored when the user selects in the calendar
   };
-  
+
   dateHandleCancel = () => {
-    this.setState({isDateModalVisible:false});
+    this.setState({ isDateModalVisible: false });
   };
 
   //when ok button is clicked, add food to the intakeList
   quantityHandleOk = () => {
-    this.setState({isQuantityModalVisible:false});
+    this.setState({ isQuantityModalVisible: false });
 
     //check if this kind of food is in the intake list;
     const exist = this.props.intakeList.find((f) => f.foodId === this.state.foodToAdd.foodId && f.intakeDate.toDateString() === this.state.intakeDate.toDateString());
-    if(exist){
+    if (exist) {
       PubSub.publish(UserUpdatedFoodFromIntakeList,
         {
           foodId: exist.foodId,
           quantity: this.state.foodQuantity,
           intakeDate: this.state.intakeDate,
         });
-    }else{
+    } else {
       PubSub.publish(UserAddedFoodToIntakeList,
         {
           foodId: this.props.foodId,
@@ -65,17 +67,17 @@ export default class Food extends Component {
     }
   };
   //close the quantity selector window
-  quantityHandleCancel(e){
+  quantityHandleCancel(e) {
     e.nativeEvent.stopImmediatePropagation();
-    this.setState({isQuantityModalVisible:false});
+    this.setState({ isQuantityModalVisible: false });
   };
   //get the quantity of the food
   onQuantityChange = (value) => {
-    this.setState({foodQuantity:value});
+    this.setState({ foodQuantity: value });
   };
 
   render() {
-    const { name, calories, photo} = this.props;
+    const { name, calories, photo } = this.props;
     return (
       <div className="SingleFood" style={{ paddingLeft: '20px', position: 'relative', height: '80px' }}>
         <img src={photo} alt={name} style={{ position: 'relative', width: '40px', float: 'left', margin: '10px 5px', verticalAlign: 'center' }} />
@@ -109,7 +111,7 @@ export default class Food extends Component {
           </LocalizationProvider>
         </Modal>
         <Modal title="Select the quantity" visible={this.state.isQuantityModalVisible} onOk={this.quantityHandleOk} onCancel={e => this.quantityHandleCancel(e)}>
-        <InputNumber style={{width:'200px !important'}} min={1} max={1000} defaultValue={1} onChange={this.onQuantityChange} />
+          <InputNumber style={{ width: '200px !important' }} min={1} max={1000} defaultValue={1} onChange={this.onQuantityChange} />
         </Modal>
       </div>
     )
