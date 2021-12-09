@@ -1,14 +1,13 @@
-// import { text } from 'dom-helpers';
 import React, { Component } from 'react'
-import { PlusCircleOutlined } from '@ant-design/icons';
-import 'antd/dist/antd.css';
 import PubSub from 'pubsub-js';
 import { UserAddedFoodToIntakeList, UserUpdatedFoodFromIntakeList } from "../event";
-import { Modal, InputNumber, Button } from 'antd';
+import { Modal, InputNumber } from 'antd';
 import Box from '@mui/material/Box';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DatePicker';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import IconButton from '@mui/material/IconButton';
 
 export default class Food extends Component {
   constructor(props) {
@@ -80,19 +79,17 @@ export default class Food extends Component {
     const { name, calories, photo } = this.props;
     return (
       <div className="SingleFood" style={{ paddingLeft: '20px', position: 'relative', height: '80px' }}>
+        <h3 style={{ color: "#33a3dc", textAlign: "center" }}>Here is your search result</h3>
+        <hr />
         <img src={photo} alt={name} style={{ position: 'relative', width: '40px', float: 'left', margin: '10px 5px', verticalAlign: 'center' }} />
         <div style={{ position: 'relative', paddingLeft: '20px' }}>
           <span style={{ color: 'black', fontSize: '1.2rem', paddingLeft: '20px' }}> {name} </span> <br />
           <span style={{ color: 'orange', fontSize: '0.8rem', fontWeight: 'bold', paddingLeft: '20px' }}>{calories}&nbsp;cal&nbsp;</span>
-          {/* <span style={{ color: 'grey', fontSize: '0.8rem', fontWeight: 'italic' }}>/&nbsp;{quantity}</span> */}
         </div>
-        <Button
-          type="primary"
-          style={{ position: 'relative', float: 'right', right: '20px', bottom: '35px' }}
-          onClick={this.addButtonHandler}
-        >
-          <PlusCircleOutlined />
-        </Button>
+        <IconButton style={{float:'right', position:'relative', marginRight:'40px', marginTop:'-50px'}}color="primary" aria-label="add" onClick={this.addButtonHandler}>
+          <AddCircleIcon />
+        </IconButton>
+
         <Modal title="Select the date" visible={this.state.isDateModalVisible} onOk={this.dateHandleOk} onCancel={this.dateHandleCancel}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DesktopDatePicker

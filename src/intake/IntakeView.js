@@ -1,15 +1,22 @@
 import { Component } from "react";
 import PubSub from 'pubsub-js';
-import { Button, Tooltip } from 'antd';
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
-import 'antd/dist/antd.css';
 import { UserUpdatedFoodFromIntakeList, UserDeletedFoodFromIntakeList } from "../event";
+import Divider from '@mui/material/Divider';
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DatePicker';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import IconButton from '@mui/material/IconButton';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 class IntakeView extends Component {
   constructor(props) {
@@ -50,12 +57,12 @@ class IntakeView extends Component {
     return (
       <div className="foodIntake">
         <hr />
-        <h3 style={{ textAlign: 'center', color: "white", padding: "20px", backgroundColor: "blue" }}>Here is Your Daily Intake:</h3>
+        <h3 style={{ textAlign: 'center', color: "white", padding: "20px", backgroundColor: "#33a3dc" }}>Here is Your Daily Intake:</h3>
         <div style={{ marginLeft: '20px', right: 'auto' }} >
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DesktopDatePicker
               label="Custom input"
-              // value={this.state.date}
+              value={this.state.intakeDate}
               onChange={(newValue) => {
                 this.setState({ intakeDate: newValue });
               }}
@@ -69,32 +76,40 @@ class IntakeView extends Component {
           </LocalizationProvider>
         </div>
         {this.props.intakeFood.map((f, index) => ((f.intakeDate.toDateString() === this.state.intakeDate.toDateString()) &&
-          <div style={{ padding: "20px" }} key={index}>
-            <img src={f.photo} alt={f.name} style={{ position: 'relative', width: '40px', margin: '10px 30px', verticalAlign: 'center' }} />
-            <div style={{ position: 'relative', marginLeft: '70px', marginTop: '-55px' }}>
-              <span style={{ color: 'ffddaa', fontSize: '1.2rem', paddingLeft: '20px' }}> {f.name} </span> <br />
-              <span style={{ color: 'orange', fontSize: '0.8rem', fontWeight: 'bold', paddingLeft: '20px' }}>{f.calories}&nbsp;cal&nbsp;</span>
-              {/* <span style={{ color: 'grey', fontSize: '0.8rem', fontWeight: 'italic' }}>/&nbsp;{f.quantity}</span> */}
-              <div style={{ position: 'relative', float: 'right', right: '20px', bottom: '20px', alignItems: 'center' }}>
-                <Tooltip title="remove" onClick={() => {
-                  // PubSub.publish(UserDeletedFoodFromIntakeList, { foodId: f.id });
-                  this.onRemoveByOne(f);
-                }}>
-                  <Button shape="circle" icon={<MinusOutlined />} />
-                </Tooltip>
-                <span style={{ color: 'blue', padding: '5px', margin: '5px' }}> {f.quantity}</span>
-                <Tooltip title="add" onClick={() => {
-                  // PubSub.publish(UserDeletedFoodFromIntakeList, { foodId: f.id });
-                  this.onAddByOne(f);
-                }}>
-                  <Button shape="circle" icon={<PlusOutlined />} />
-                </Tooltip>
-              </div>
-            </div>
-            <div className="splitLine">
-              <div style={{ width: "100%", backgroundColor: "blue", height: "1px" }}></div>
-            </div>
+          <div style={{ paddingLeft: "20px" }} key={index}>
+            
+          <List sx={{ width: '100%',  bgcolor: 'background.paper' }}>
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar alt={f.name} src={f.photo} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={f.name}
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: 'inline' }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      {f.calories}
+                    </Typography>
+                  </React.Fragment>
+                }
+              />
+              <IconButton aria-label="remove" onClick={() => {this.onRemoveByOne(f)}}>
+                <RemoveCircleIcon />
+              </IconButton>
+              <span style={{ color: '#009ad6', padding: '5px', margin: '5px' }}> {f.quantity}</span>
+              <IconButton aria-label="add" onClick={() => {this.onAddByOne(f)}}>
+                <AddCircleIcon />
+              </IconButton>
+            </ListItem>
+            <Divider variant="inset" component="li" />
+          </List>
           </div>
+          
         ))}
       </div>)
   }
