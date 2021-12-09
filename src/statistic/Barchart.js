@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Typography from '@mui/material/Typography';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 
 export default class Barchart extends Component {
@@ -25,7 +25,7 @@ export default class Barchart extends Component {
     const dailyCalories = Object.getOwnPropertyNames(foodByDate).reduce((calories, date) => {
       const foods = foodByDate[date];
       const calorie = foods.reduce((total, food) => {
-        return total + food.calories  * food.quantity;
+        return total + food.calories * food.quantity;
       }, 0);
       calories.push({
         date, calorie
@@ -33,32 +33,32 @@ export default class Barchart extends Component {
       return calories;
     }, []);
     dailyCalories.sort((a, b) => {
-      return b.date - a.date;
+      return new Date(a.date) - new Date(b.date);
     });
 
     return (
       <div>
-      <ResponsiveContainer width='80%' height={600}>
-      <BarChart
-        width={300}
-        height={200}
-        data={dailyCalories}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5
-        }}
-        barSize={20}
-      >
-        <XAxis dataKey="date" tick={{fontSize: 9}} angle={-45} textAnchor="end" scale="point" padding={{ left: 10, right: 10 }} />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Bar dataKey="calorie" fill="#8884d8" background={{ fill: "#eee" }} ></Bar>        
-      </BarChart>      
-      </ResponsiveContainer>    
+        <ResponsiveContainer width='80%' height={600}>
+          <BarChart
+            width={300}
+            height={200}
+            data={dailyCalories}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5
+            }}
+            barSize={20}
+          >
+            <XAxis dataKey="date" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" scale="point" padding={{ left: 10, right: 10 }} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Bar dataKey="calorie" fill="#8884d8" background={{ fill: "#eee" }} ></Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     )
   }
