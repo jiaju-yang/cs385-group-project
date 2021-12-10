@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,ResponsiveC
 
 
 export default class Barchart extends Component {
+  
   render() {
     const foodList = this.props.intakeFood;
     const today = new Date();
@@ -12,6 +13,7 @@ export default class Barchart extends Component {
     foodList.forEach(food => {
       food.intakeDate = new Date(food.intakeDate.toDateString());
     });
+
     const foodByDate = foodList.filter((food) => {
       return food.intakeDate >= weekAgo;
     }).reduce((groups, food) => {
@@ -22,6 +24,7 @@ export default class Barchart extends Component {
       groups[dateString].push(food);
       return groups;
     }, {});
+
     const dailyCalories = Object.getOwnPropertyNames(foodByDate).reduce((calories, date) => {
       const foods = foodByDate[date];
       const calorie = foods.reduce((total, food) => {
@@ -35,6 +38,13 @@ export default class Barchart extends Component {
     dailyCalories.sort((a, b) => {
       return b.date - a.date;
     });
+    
+    /*
+    var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    function getweekdays(arr) {
+      return days[arr.date.getDay()]
+    }
+    getweekdays(dailyCalories);*/
 
     return (
       <div>
