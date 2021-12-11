@@ -51,7 +51,7 @@ class LoginView extends Component {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h3" variant="h7">
-            Welcome to AS ROCK
+            Welcome to MetaFitness!
           </Typography>
           
           <div>
