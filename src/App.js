@@ -20,6 +20,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseApp } from "./fbconfig";
 import { addFood, getFood, updateFood, deleteFood } from "./repository"
 import 'antd/dist/antd.css';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 
 class App extends Component {
@@ -68,7 +69,6 @@ class App extends Component {
           } else {
             parent.setState({
               "searchKeyword": data.keyword,
-              //use some fake date
               "foundFoods": [],
               "fetchingStatus": apiStatus.failed,
               "fetchingError": result.data.error
@@ -167,7 +167,7 @@ class App extends Component {
               >
                 <BottomNavigationAction label="Home" value="home" icon={<AnalyticsIcon />} />
                 <BottomNavigationAction label="Search" value="search" icon={<SearchIcon />} />
-                <BottomNavigationAction label="Intake" value="intake" icon={<AnalyticsIcon />} />
+                <BottomNavigationAction label="Intake" value="intake" icon={<ListAltIcon />} />
               </BottomNavigation>
             </Paper>
           </Box>
