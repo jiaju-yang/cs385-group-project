@@ -25,6 +25,11 @@ npm start
 
 Then you can open `localhost:3000` on your browser to preview it.
 
+Test account:
+
+* username: cs385@gmail.com
+* password: 123456
+
 # Git Workflow
 
 ## Step 1: Obtain A Task
