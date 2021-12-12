@@ -69,8 +69,7 @@ class App extends Component {
             parent.setState({
               "searchKeyword": data.keyword,
               //use some fake date
-              "foundFoods": [{ "id": 1, "name": 'egg', "cal": 100, "photo": null },
-              { "id": 2, "name": 'apple', "cal": 50, "photo": null }],
+              "foundFoods": [],
               "fetchingStatus": apiStatus.failed,
               "fetchingError": result.data.error
             })

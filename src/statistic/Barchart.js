@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Typography from '@mui/material/Typography';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 
